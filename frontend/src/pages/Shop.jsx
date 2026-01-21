@@ -6,7 +6,7 @@ const Shop = ({ addToCart }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Page Header */}
-      <section className="bg-gradient-primary text-white section-padding py-16">
+      <section className="bg-gradient-primary text-white px-4 md:px-6 py-8">
         <div className="container-custom text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}

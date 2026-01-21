@@ -23,9 +23,7 @@ const ProductDetail = ({ addToCart }) => {
   }
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product);
-    }
+    addToCart(product, quantity);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
@@ -33,18 +31,38 @@ const ProductDetail = ({ addToCart }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb */}
-      <div className="bg-white border-b">
-        <div className="container-custom section-padding py-4">
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <Link to="/" className="hover:text-primary-600">
+      <div className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-200">
+        <div className="container-custom px-4 md:px-6 py-3">
+          <div className="flex items-center space-x-2 text-sm">
+            <Link
+              to="/"
+              className="text-gray-500 hover:text-primary-600 transition-colors font-medium"
+            >
               Home
             </Link>
-            <span>/</span>
-            <Link to="/shop" className="hover:text-primary-600">
+            <svg
+              className="w-4 h-4 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            <Link
+              to="/shop"
+              className="text-gray-500 hover:text-primary-600 transition-colors font-medium"
+            >
               Shop
             </Link>
-            <span>/</span>
-            <span className="text-gray-900">{product.name}</span>
+            <svg
+              className="w-4 h-4 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            <span className="text-gray-900 font-semibold">{product.name}</span>
           </div>
         </div>
       </div>

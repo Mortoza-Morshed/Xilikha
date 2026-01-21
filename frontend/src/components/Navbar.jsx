@@ -11,7 +11,7 @@ const Navbar = ({ cartCount }) => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <img src="/assets/logo.png" alt="Xilikha Logo" className="h-10 w-10" />
+            <img src="/assets/logo.png" alt="Xilikha Logo" className="h-16 w-16 -my-2" />
             <div>
               <h1 className="text-2xl font-display font-bold text-primary-700">Xilikha</h1>
               <p className="text-xs text-gray-600">Heritage Wellness from Assam</p>
