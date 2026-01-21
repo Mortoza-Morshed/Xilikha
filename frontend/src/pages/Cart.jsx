@@ -16,7 +16,7 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
           <h2 className="text-3xl font-display font-bold text-gray-900 mb-4">Your Cart is Empty</h2>
           <p className="text-gray-600 mb-8">Add some products to get started!</p>
           <Link to="/shop">
-            <button className="btn-primary">Start Shopping</button>
+            <button className="btn-primary cursor-pointer">Start Shopping</button>
           </Link>
         </div>
       </div>
@@ -61,7 +61,7 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
                   {/* Product Details */}
                   <div className="flex-1">
                     <Link to={`/product/${item.id}`}>
-                      <h3 className="text-xl font-display font-semibold text-gray-900 hover:text-primary-600 transition-colors">
+                      <h3 className="text-xl font-display font-semibold text-gray-900 hover:text-primary-600 transition-colors cursor-pointer">
                         {item.name}
                       </h3>
                     </Link>
@@ -73,7 +73,7 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
                   <div className="flex flex-col justify-between items-end">
                     <button
                       onClick={() => removeFromCart(item.id)}
-                      className="text-red-600 hover:text-red-700 transition-colors mb-4"
+                      className="text-red-600 hover:text-red-700 transition-colors mb-4 cursor-pointer"
                     >
                       <svg
                         className="w-6 h-6"
@@ -93,14 +93,14 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
                     <div className="flex items-center border border-gray-300 rounded-lg">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="px-3 py-1 text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="px-3 py-1 text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                       >
                         -
                       </button>
                       <span className="px-4 py-1 font-semibold">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="px-3 py-1 text-gray-700 hover:bg-gray-100 transition-colors"
+                        className="px-3 py-1 text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                       >
                         +
                       </button>
@@ -141,14 +141,14 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full btn-primary mb-4"
+                    className="w-full btn-primary mb-4 cursor-pointer"
                   >
                     Proceed to Checkout
                   </motion.button>
                 </Link>
 
                 <Link to="/shop">
-                  <button className="w-full btn-outline">Continue Shopping</button>
+                  <button className="w-full btn-outline cursor-pointer">Continue Shopping</button>
                 </Link>
               </div>
             </div>

@@ -12,7 +12,7 @@ const ProductCard = ({ product, addToCart }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       whileHover={{ y: -8 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.1 }}
       className="card group"
     >
       <Link to={`/product/${product.id}`}>

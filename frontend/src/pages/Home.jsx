@@ -39,7 +39,7 @@ const Home = ({ addToCart }) => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-primary-600 hover:bg-primary-700 text-white font-medium px-8 py-4 rounded-lg transition-all text-lg w-full sm:w-auto min-w-[140px] shadow-lg hover:shadow-xl"
+                  className="bg-primary-600 transition-all 0.2s ease-in-out cursor-pointer hover:bg-primary-700 text-white font-medium px-8 py-4 rounded-lg text-lg w-full sm:w-auto min-w-[140px] shadow-lg hover:shadow-xl"
                 >
                   Shop Now
                 </motion.button>
@@ -48,7 +48,7 @@ const Home = ({ addToCart }) => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-primary-700 font-medium px-8 py-3.5 rounded-lg transition-all text-lg w-full sm:w-auto min-w-[140px]"
+                  className="bg-white/10 transition-all 0.2s ease-in-out cursor-pointer backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-primary-700 font-medium px-8 py-3.5 rounded-lg text-lg w-full sm:w-auto min-w-[140px]"
                 >
                   Our Story
                 </motion.button>
@@ -94,7 +94,7 @@ const Home = ({ addToCart }) => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="btn-secondary"
+                className="btn-secondary cursor-pointer"
               >
                 View All Products
               </motion.button>

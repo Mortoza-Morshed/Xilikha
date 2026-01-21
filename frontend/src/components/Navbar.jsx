@@ -22,31 +22,31 @@ const Navbar = ({ cartCount }) => {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+              className="text-gray-700 hover:text-primary-600 font-medium transition-colors cursor-pointer"
             >
               Home
             </Link>
             <Link
               to="/shop"
-              className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+              className="text-gray-700 hover:text-primary-600 font-medium transition-colors cursor-pointer"
             >
               Shop
             </Link>
             <Link
               to="/about"
-              className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+              className="text-gray-700 hover:text-primary-600 font-medium transition-colors cursor-pointer"
             >
               About
             </Link>
             <Link
               to="/how-to-use"
-              className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+              className="text-gray-700 hover:text-primary-600 font-medium transition-colors cursor-pointer"
             >
               How to Use
             </Link>
             <Link
               to="/contact"
-              className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+              className="text-gray-700 hover:text-primary-600 font-medium transition-colors cursor-pointer"
             >
               Contact
             </Link>
@@ -56,7 +56,7 @@ const Navbar = ({ cartCount }) => {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-primary-600 hover:bg-primary-700 text-white p-3 rounded-full transition-colors relative"
+                className="bg-primary-600 cursor-pointer hover:bg-primary-700 text-white p-3 rounded-full transition-colors relative"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -117,36 +117,39 @@ const Navbar = ({ cartCount }) => {
             animate={{ opacity: 1, y: 0 }}
             className="md:hidden mt-4 pb-4 space-y-3"
           >
-            <Link to="/" className="block text-gray-700 hover:text-primary-600 font-medium py-2">
+            <Link
+              to="/"
+              className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
+            >
               Home
             </Link>
             <Link
               to="/shop"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2"
+              className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
             >
               Shop
             </Link>
             <Link
               to="/about"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2"
+              className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
             >
               About
             </Link>
             <Link
               to="/how-to-use"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2"
+              className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
             >
               How to Use
             </Link>
             <Link
               to="/contact"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2"
+              className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
             >
               Contact
             </Link>
             <Link
               to="/cart"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2"
+              className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
             >
               Cart ({cartCount})
             </Link>

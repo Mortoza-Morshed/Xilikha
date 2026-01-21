@@ -14,7 +14,7 @@ const ProductDetail = ({ addToCart }) => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Product Not Found</h2>
-          <Link to="/shop" className="btn-primary">
+          <Link to="/shop" className="btn-primary cursor-pointer">
             Back to Shop
           </Link>
         </div>
@@ -36,7 +36,7 @@ const ProductDetail = ({ addToCart }) => {
           <div className="flex items-center space-x-2 text-sm">
             <Link
               to="/"
-              className="text-gray-500 hover:text-primary-600 transition-colors font-medium"
+              className="text-gray-500 hover:text-primary-600 transition-colors font-medium cursor-pointer"
             >
               Home
             </Link>
@@ -50,7 +50,7 @@ const ProductDetail = ({ addToCart }) => {
             </svg>
             <Link
               to="/shop"
-              className="text-gray-500 hover:text-primary-600 transition-colors font-medium"
+              className="text-gray-500 hover:text-primary-600 transition-colors font-medium cursor-pointer"
             >
               Shop
             </Link>

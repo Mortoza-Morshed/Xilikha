@@ -127,7 +127,7 @@ const Contact = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     type="submit"
-                    className="w-full btn-primary"
+                    className="w-full btn-primary cursor-pointer"
                   >
                     Send Message
                   </motion.button>
