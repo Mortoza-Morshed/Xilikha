@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -12,7 +12,25 @@ import Checkout from "./pages/Checkout";
 import Contact from "./pages/Contact";
 
 function App() {
-  const [cart, setCart] = useState([]);
+  // Load cart from localStorage on initial mount
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem("xilikha_cart");
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error("Error loading cart from localStorage:", error);
+      return [];
+    }
+  });
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("xilikha_cart", JSON.stringify(cart));
+    } catch (error) {
+      console.error("Error saving cart to localStorage:", error);
+    }
+  }, [cart]);
 
   const addToCart = (product, quantity = 1) => {
     const existingItem = cart.find((item) => item.id === product.id);

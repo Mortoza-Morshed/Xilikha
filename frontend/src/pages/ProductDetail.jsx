@@ -1,19 +1,55 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { getProductById } from "../data/products";
+import { useState, useEffect } from "react";
+import { getProductById } from "../services/productService";
 
 const ProductDetail = ({ addToCart }) => {
   const { id } = useParams();
-  const product = getProductById(id);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
 
-  if (!product) {
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const data = await getProductById(id);
+        setProduct(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  const handleAddToCart = () => {
+    addToCart(product, quantity);
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Product Not Found</h2>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-gray-600">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            {error ? `Error: ${error}` : "Product Not Found"}
+          </h2>
           <Link to="/shop" className="btn-primary cursor-pointer">
             Back to Shop
           </Link>
@@ -21,12 +57,6 @@ const ProductDetail = ({ addToCart }) => {
       </div>
     );
   }
-
-  const handleAddToCart = () => {
-    addToCart(product, quantity);
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
