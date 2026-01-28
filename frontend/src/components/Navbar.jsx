@@ -1,9 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = ({ cartCount }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    setIsUserMenuOpen(false);
+    navigate("/");
+  };
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -51,38 +61,119 @@ const Navbar = ({ cartCount }) => {
               Contact
             </Link>
 
-            {/* Cart Icon */}
-            <Link to="/cart" className="relative">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-primary-600 cursor-pointer hover:bg-primary-700 text-white p-3 rounded-full transition-colors relative"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            {/* Cart Icon - Only show when logged in */}
+            {user && (
+              <Link to="/cart" className="relative">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-primary-600 cursor-pointer hover:bg-primary-700 text-white p-3 rounded-full transition-colors relative"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                {cartCount > 0 && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute -top-2 -right-2 bg-accent-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center"
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    {cartCount}
-                  </motion.span>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                  {cartCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-2 -right-2 bg-accent-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center"
+                    >
+                      {cartCount}
+                    </motion.span>
+                  )}
+                </motion.button>
+              </Link>
+            )}
+
+            {/* Auth Buttons / User Menu */}
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                >
+                  <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer">
+                    {user.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <svg
+                    className="w-4 h-4 cursor-pointer"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50"
+                  >
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      My Orders
+                    </Link>
+                    <hr className="my-2" />
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Logout
+                    </button>
+                  </motion.div>
                 )}
-              </motion.button>
-            </Link>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <Link to="/login">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="text-primary-600 hover:text-primary-700 font-medium cursor-pointer"
+                  >
+                    Login
+                  </motion.button>
+                </Link>
+                <Link to="/register">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium cursor-pointer"
+                  >
+                    Register
+                  </motion.button>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -147,12 +238,45 @@ const Navbar = ({ cartCount }) => {
             >
               Contact
             </Link>
-            <Link
-              to="/cart"
-              className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
-            >
-              Cart ({cartCount})
-            </Link>
+            {user && (
+              <Link
+                to="/cart"
+                className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
+              >
+                Cart ({cartCount})
+              </Link>
+            )}
+            {user ? (
+              <>
+                <Link
+                  to="/profile"
+                  className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left text-red-600 hover:text-red-700 font-medium py-2 cursor-pointer"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </motion.div>
         )}
       </div>
