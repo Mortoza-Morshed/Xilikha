@@ -210,30 +210,35 @@ const Navbar = ({ cartCount }) => {
           >
             <Link
               to="/"
+              onClick={() => setIsMenuOpen(false)}
               className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
             >
               Home
             </Link>
             <Link
               to="/shop"
+              onClick={() => setIsMenuOpen(false)}
               className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
             >
               Shop
             </Link>
             <Link
               to="/about"
+              onClick={() => setIsMenuOpen(false)}
               className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
             >
               About
             </Link>
             <Link
               to="/how-to-use"
+              onClick={() => setIsMenuOpen(false)}
               className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
             >
               How to Use
             </Link>
             <Link
               to="/contact"
+              onClick={() => setIsMenuOpen(false)}
               className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
             >
               Contact
@@ -241,6 +246,7 @@ const Navbar = ({ cartCount }) => {
             {user && (
               <Link
                 to="/cart"
+                onClick={() => setIsMenuOpen(false)}
                 className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
               >
                 Cart ({cartCount})
@@ -250,12 +256,23 @@ const Navbar = ({ cartCount }) => {
               <>
                 <Link
                   to="/profile"
+                  onClick={() => setIsMenuOpen(false)}
                   className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
                 >
                   Profile
                 </Link>
+                <Link
+                  to="/orders"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
+                >
+                  My Orders
+                </Link>
                 <button
-                  onClick={handleLogout}
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleLogout();
+                  }}
                   className="block w-full text-left text-red-600 hover:text-red-700 font-medium py-2 cursor-pointer"
                 >
                   Logout
@@ -265,12 +282,14 @@ const Navbar = ({ cartCount }) => {
               <>
                 <Link
                   to="/login"
+                  onClick={() => setIsMenuOpen(false)}
                   className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
+                  onClick={() => setIsMenuOpen(false)}
                   className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
                 >
                   Register

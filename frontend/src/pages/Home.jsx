@@ -26,13 +26,17 @@ const Home = ({ addToCart }) => {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[500px] sm:h-[600px] flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url(/assets/hero-bg.png)" }}
+          style={{
+            backgroundImage: "url(/assets/hero-bg.png)",
+            backgroundPosition: "center center",
+            backgroundSize: "cover",
+          }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-600/30 to-primary-800/40"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-700/50 to-primary-900/60"></div>
         </div>
 
         {/* Content */}
@@ -42,7 +46,7 @@ const Home = ({ addToCart }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl md:text-7xl font-display font-bold mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-display font-bold mb-6">
               Heritage Wellness
               <br />
               from the Heart of <span className="text-accent-400">Assam</span>

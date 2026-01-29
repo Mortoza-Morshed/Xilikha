@@ -18,6 +18,7 @@ const Checkout = ({ cart, clearCart }) => {
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   // Pre-fill form with user data
   useEffect(() => {
@@ -72,9 +73,10 @@ const Checkout = ({ cart, clearCart }) => {
       // Create order via API
       const order = await createOrder(orderData);
 
-      // Clear cart and redirect to confirmation
+      // Clear cart and redirect to orders page
+      setOrderPlaced(true);
       clearCart();
-      navigate(`/order-confirmation/${order._id}`);
+      navigate("/orders");
     } catch (err) {
       console.error("Order creation error:", err);
       setError(err.response?.data?.message || "Failed to place order. Please try again.");
@@ -82,7 +84,7 @@ const Checkout = ({ cart, clearCart }) => {
     }
   };
 
-  if (cart.length === 0) {
+  if (cart.length === 0 && !orderPlaced) {
     navigate("/cart");
     return null;
   }
@@ -108,8 +110,8 @@ const Checkout = ({ cart, clearCart }) => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Checkout Form */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-md p-8">
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-6">
+              <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 md:p-8">
+                <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 mb-4 sm:mb-6">
                   Shipping Information
                 </h2>
 
@@ -238,7 +240,7 @@ const Checkout = ({ cart, clearCart }) => {
                     whileTap={{ scale: 0.98 }}
                     type="submit"
                     disabled={isProcessing}
-                    className={`w-full ${
+                    className={`w-full cursor-pointer ${
                       isProcessing ? "bg-gray-400" : "bg-primary-600 hover:bg-primary-700"
                     } text-white font-bold px-6 py-4 rounded-lg transition-colors text-lg`}
                   >
@@ -250,8 +252,8 @@ const Checkout = ({ cart, clearCart }) => {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-6">
+              <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:sticky lg:top-24">
+                <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 mb-4 sm:mb-6">
                   Order Summary
                 </h2>
 

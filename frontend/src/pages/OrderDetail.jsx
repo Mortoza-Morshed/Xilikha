@@ -97,7 +97,11 @@ const OrderDetail = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-display font-bold"
           >
-            Order #{order.orderNumber}
+            {order.items.length === 1
+              ? order.items[0].product?.name || "Your Order"
+              : order.items.length === 2
+                ? `${order.items[0].product?.name || "Product"} & ${order.items[1].product?.name || "Product"}`
+                : `${order.items[0].product?.name || "Product"} & ${order.items.length - 1} more`}
           </motion.h1>
         </div>
       </section>
@@ -114,13 +118,15 @@ const OrderDetail = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-xl shadow-lg p-8"
               >
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-6">Order Status</h2>
+                <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 mb-4 sm:mb-6">
+                  Order Status
+                </h2>
                 <div className="relative">
                   <div className="flex justify-between">
                     {statusSteps.map((step, index) => (
                       <div key={step.key} className="flex flex-col items-center flex-1">
                         <div
-                          className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl mb-2 ${
+                          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-xl sm:text-2xl mb-2 ${
                             step.completed
                               ? "bg-primary-600 text-white"
                               : "bg-gray-200 text-gray-400"
@@ -129,7 +135,7 @@ const OrderDetail = () => {
                           {step.icon}
                         </div>
                         <p
-                          className={`text-sm text-center ${
+                          className={`text-xs sm:text-sm text-center px-1 ${
                             step.completed ? "text-gray-900 font-semibold" : "text-gray-500"
                           }`}
                         >
@@ -165,24 +171,33 @@ const OrderDetail = () => {
                 transition={{ delay: 0.1 }}
                 className="bg-white rounded-xl shadow-lg p-8"
               >
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-6">Order Items</h2>
+                <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 mb-4 sm:mb-6">
+                  Order Items
+                </h2>
                 <div className="space-y-4">
                   {order.items.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between py-4 border-b">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <span className="text-2xl">📦</span>
-                        </div>
+                    <div
+                      key={index}
+                      className="flex items-center justify-between py-3 sm:py-4 border-b gap-3"
+                    >
+                      <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
+                        <img
+                          src={item.product?.image || "/assets/placeholder.png"}
+                          alt={item.product?.name || "Product"}
+                          className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg flex-shrink-0"
+                        />
                         <div>
-                          <p className="font-semibold text-gray-900">
+                          <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                             {item.product?.name || "Product"}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-xs sm:text-sm text-gray-600">
                             ₹{item.price} x {item.quantity}
                           </p>
                         </div>
                       </div>
-                      <p className="font-bold text-gray-900">₹{item.price * item.quantity}</p>
+                      <p className="font-bold text-gray-900 text-sm sm:text-base whitespace-nowrap">
+                        ₹{item.price * item.quantity}
+                      </p>
                     </div>
                   ))}
                 </div>

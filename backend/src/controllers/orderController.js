@@ -139,3 +139,48 @@ export const updateOrderStatus = async (req, res) => {
     });
   }
 };
+
+// @desc    Cancel order
+// @route   PUT /api/orders/:id/cancel
+// @access  Private
+export const cancelOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Check if order belongs to user
+    if (order.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to cancel this order",
+      });
+    }
+
+    // Only allow cancellation of pending orders
+    if (order.orderStatus !== "pending") {
+      return res.status(400).json({
+        success: false,
+        message: "Only pending orders can be cancelled",
+      });
+    }
+
+    order.orderStatus = "cancelled";
+    await order.save();
+
+    res.json({
+      success: true,
+      data: order,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
