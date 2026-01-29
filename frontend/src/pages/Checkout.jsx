@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
+import { createOrder } from "../services/orderService";
 
 const Checkout = ({ cart, clearCart }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,7 +17,19 @@ const Checkout = ({ cart, clearCart }) => {
     pincode: "",
   });
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [error, setError] = useState("");
+
+  // Pre-fill form with user data
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      }));
+    }
+  }, [user]);
 
   const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const shipping = subtotal > 500 ? 0 : 50;
@@ -30,51 +45,46 @@ const Checkout = ({ cart, clearCart }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
+    setError("");
 
-    // Simulate order processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      setOrderPlaced(true);
+    try {
+      // Transform cart items to match backend schema
+      const orderData = {
+        items: cart.map((item) => ({
+          product: item._id, // MongoDB ID
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        shippingAddress: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+        },
+        subtotal: subtotal,
+        shipping: shipping,
+        total: total,
+      };
+
+      // Create order via API
+      const order = await createOrder(orderData);
+
+      // Clear cart and redirect to confirmation
       clearCart();
-
-      // Redirect to home after 3 seconds
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-    }, 2000);
+      navigate(`/order-confirmation/${order._id}`);
+    } catch (err) {
+      console.error("Order creation error:", err);
+      setError(err.response?.data?.message || "Failed to place order. Please try again.");
+      setIsProcessing(false);
+    }
   };
 
-  if (cart.length === 0 && !orderPlaced) {
+  if (cart.length === 0) {
     navigate("/cart");
     return null;
-  }
-
-  if (orderPlaced) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="bg-white rounded-xl shadow-lg p-12 text-center max-w-md"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-6xl mb-6"
-          >
-            ✅
-          </motion.div>
-          <h2 className="text-3xl font-display font-bold text-gray-900 mb-4">
-            Order Placed Successfully!
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Thank you for your order. We'll send you a confirmation email shortly.
-          </p>
-          <p className="text-sm text-gray-500">Redirecting to homepage...</p>
-        </motion.div>
-      </div>
-    );
   }
 
   return (
@@ -102,6 +112,17 @@ const Checkout = ({ cart, clearCart }) => {
                 <h2 className="text-2xl font-display font-bold text-gray-900 mb-6">
                   Shipping Information
                 </h2>
+
+                {/* Error Message */}
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6"
+                  >
+                    {error}
+                  </motion.div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>

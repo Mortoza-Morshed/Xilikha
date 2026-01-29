@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
@@ -13,8 +13,18 @@ const Login = () => {
     password: "",
   });
   const [error, setError] = useState("");
+  const [redirectMessage, setRedirectMessage] = useState("");
 
-  const from = location.state?.from?.pathname || "/";
+  // Check for redirect message from sessionStorage
+  useEffect(() => {
+    const message = sessionStorage.getItem("redirectMessage");
+    if (message) {
+      setRedirectMessage(message);
+      sessionStorage.removeItem("redirectMessage");
+    }
+  }, []);
+
+  const from = location.state?.from?.pathname || sessionStorage.getItem("redirectFrom") || "/";
 
   const handleChange = (e) => {
     setFormData({
@@ -37,6 +47,8 @@ const Login = () => {
     const result = await login(formData.email, formData.password);
 
     if (result.success) {
+      // Clear redirect message from sessionStorage
+      sessionStorage.removeItem("redirectFrom");
       navigate(from, { replace: true });
     } else {
       setError(result.error);
@@ -55,6 +67,17 @@ const Login = () => {
           <h1 className="text-3xl font-display font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Login to your Xilikha account</p>
         </div>
+
+        {/* Redirect Message */}
+        {redirectMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-6"
+          >
+            {redirectMessage}
+          </motion.div>
+        )}
 
         {/* Error Message */}
         {error && (

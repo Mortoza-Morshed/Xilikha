@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -14,10 +14,14 @@ import Contact from "../pages/Contact";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Profile from "../pages/Profile";
+import OrderConfirmation from "../pages/OrderConfirmation";
+import OrderHistory from "../pages/OrderHistory";
+import OrderDetail from "../pages/OrderDetail";
 import ProtectedRoute from "./ProtectedRoute";
 
 const AppContent = () => {
   const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   // Load cart from localStorage on initial mount
   const [cart, setCart] = useState(() => {
@@ -48,6 +52,15 @@ const AppContent = () => {
   }, [isAuthenticated]);
 
   const addToCart = (product, quantity = 1) => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Store intended action in sessionStorage to show message on login page
+      sessionStorage.setItem("redirectMessage", "Please login to add items to your cart");
+      sessionStorage.setItem("redirectFrom", window.location.pathname);
+      navigate("/login");
+      return;
+    }
+
     const existingItem = cart.find((item) => item.id === product.id);
 
     if (existingItem) {
@@ -113,6 +126,30 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/order-confirmation/:orderId"
+            element={
+              <ProtectedRoute>
+                <OrderConfirmation />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <OrderHistory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders/:id"
+            element={
+              <ProtectedRoute>
+                <OrderDetail />
               </ProtectedRoute>
             }
           />
