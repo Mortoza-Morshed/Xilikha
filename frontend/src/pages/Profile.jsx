@@ -53,22 +53,24 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-accent-50 py-6 sm:py-12 px-4">
       <div className="container-custom max-w-3xl">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-xl p-8 mb-6"
+          className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 mb-6"
         >
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl font-bold flex-shrink-0">
                 {user?.name?.charAt(0).toUpperCase()}
               </div>
-              <div>
-                <h1 className="text-3xl font-display font-bold text-gray-900">{user?.name}</h1>
-                <p className="text-gray-600">{user?.email}</p>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-gray-900 truncate">
+                  {user?.name}
+                </h1>
+                <p className="text-sm sm:text-base text-gray-600 truncate">{user?.email}</p>
               </div>
             </div>
             {!isEditing && (
@@ -76,7 +78,7 @@ const Profile = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsEditing(true)}
-                className="btn-primary cursor-pointer"
+                className="btn-primary cursor-pointer w-full sm:w-auto"
               >
                 Edit Profile
               </motion.button>
@@ -139,7 +141,7 @@ const Profile = () => {
                 />
               </div>
 
-              <div className="flex space-x-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -174,22 +176,28 @@ const Profile = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Full Name</p>
-                  <p className="text-lg font-medium text-gray-900">{user?.name}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Full Name</p>
+                  <p className="text-base sm:text-lg font-medium text-gray-900 break-words">
+                    {user?.name}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Email</p>
-                  <p className="text-lg font-medium text-gray-900">{user?.email}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Email</p>
+                  <p className="text-base sm:text-lg font-medium text-gray-900 break-all">
+                    {user?.email}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Phone</p>
-                  <p className="text-lg font-medium text-gray-900">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Phone</p>
+                  <p className="text-base sm:text-lg font-medium text-gray-900">
                     {user?.phone || "Not provided"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Account Type</p>
-                  <p className="text-lg font-medium text-gray-900 capitalize">{user?.role}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Account Type</p>
+                  <p className="text-base sm:text-lg font-medium text-gray-900 capitalize">
+                    {user?.role}
+                  </p>
                 </div>
               </div>
             </div>

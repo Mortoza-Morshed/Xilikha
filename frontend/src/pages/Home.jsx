@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import ProductCard from "../components/ProductCard";
 import { getFeaturedProducts } from "../services/productService";
 
-const Home = ({ addToCart }) => {
+const Home = ({ addToCart, cart, updateQuantity }) => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +36,7 @@ const Home = ({ addToCart }) => {
             backgroundSize: "cover",
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-700/50 to-primary-900/60"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-700/60 to-primary-900/70"></div>
         </div>
 
         {/* Content */}
@@ -105,7 +105,12 @@ const Home = ({ addToCart }) => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <ProductCard product={product} addToCart={addToCart} />
+                <ProductCard
+                  product={product}
+                  addToCart={addToCart}
+                  cart={cart}
+                  updateQuantity={updateQuantity}
+                />
               </motion.div>
             ))}
           </div>

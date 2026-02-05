@@ -97,9 +97,20 @@ const AppContent = () => {
       <Navbar cartCount={cartCount} />
       <main className="flex-grow">
         <Routes>
-          <Route path="/" element={<Home addToCart={addToCart} />} />
-          <Route path="/shop" element={<Shop addToCart={addToCart} />} />
-          <Route path="/product/:id" element={<ProductDetail addToCart={addToCart} />} />
+          <Route
+            path="/"
+            element={<Home addToCart={addToCart} cart={cart} updateQuantity={updateQuantity} />}
+          />
+          <Route
+            path="/shop"
+            element={<Shop addToCart={addToCart} cart={cart} updateQuantity={updateQuantity} />}
+          />
+          <Route
+            path="/product/:id"
+            element={
+              <ProductDetail addToCart={addToCart} cart={cart} updateQuantity={updateQuantity} />
+            }
+          />
           <Route path="/about" element={<About />} />
           <Route path="/how-to-use" element={<HowToUse />} />
           <Route

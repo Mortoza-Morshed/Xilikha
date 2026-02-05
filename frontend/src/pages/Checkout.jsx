@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { createOrder } from "../services/orderService";
+import { createRazorpayOrder, verifyPayment } from "../services/paymentService";
 
 const Checkout = ({ cart, clearCart }) => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const Checkout = ({ cart, clearCart }) => {
     state: "Assam",
     pincode: "",
   });
+  const [paymentMethod, setPaymentMethod] = useState("COD");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
@@ -68,18 +70,92 @@ const Checkout = ({ cart, clearCart }) => {
         subtotal: subtotal,
         shipping: shipping,
         total: total,
+        paymentMethod: paymentMethod, // Add payment method
       };
 
-      // Create order via API
-      const order = await createOrder(orderData);
+      if (paymentMethod === "COD") {
+        // Handle Cash on Delivery
+        await createOrder(orderData);
+        setOrderPlaced(true);
+        clearCart();
+        navigate("/orders");
+      } else {
+        // Handle Razorpay Payment
 
-      // Clear cart and redirect to orders page
-      setOrderPlaced(true);
-      clearCart();
-      navigate("/orders");
+        // 1. Create order in DB first (PENDING status)
+        const newOrder = await createOrder({
+          ...orderData,
+          paymentStatus: "PENDING",
+          paymentMethod: "RAZORPAY",
+        });
+        const dbOrderId = newOrder._id;
+
+        // 2. Create Razorpay order (backend)
+        const { orderId, amount, keyId } = await createRazorpayOrder(total);
+
+        // 3. Open Razorpay Modal
+        const options = {
+          key: keyId,
+          amount: amount,
+          currency: "INR",
+          name: "Xilikha",
+          description: "Wellness Products Order",
+          image: "/assets/logo.png",
+          order_id: orderId,
+          handler: async function (response) {
+            try {
+              // 4. Verify Payment (backend)
+              const verifyData = {
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+                orderId: dbOrderId,
+              };
+
+              const result = await verifyPayment(verifyData);
+
+              if (result.success) {
+                setOrderPlaced(true);
+                clearCart();
+                navigate("/orders");
+              }
+            } catch (err) {
+              console.error("Payment verification failed:", err);
+              setError("Payment verification failed. Please contact support.");
+              setIsProcessing(false);
+            }
+          },
+          prefill: {
+            name: formData.name,
+            email: formData.email,
+            contact: formData.phone,
+          },
+          theme: {
+            color: "#16a34a",
+          },
+          modal: {
+            ondismiss: function () {
+              setIsProcessing(false);
+            },
+          },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      }
     } catch (err) {
-      console.error("Order creation error:", err);
-      setError(err.response?.data?.message || "Failed to place order. Please try again.");
+      console.error("Order process error:", err);
+
+      // Handle unauthorized error (expired token)
+      if (err.response?.status === 401) {
+        setError("Session expired. Please login again.");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+        return;
+      }
+
+      setError(err.response?.data?.message || err.message || "Failed to process order.");
       setIsProcessing(false);
     }
   };
@@ -247,6 +323,51 @@ const Checkout = ({ cart, clearCart }) => {
                     {isProcessing ? "Processing..." : "Place Order"}
                   </motion.button>
                 </form>
+              </div>
+              <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 md:p-8 mt-6">
+                <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 mb-4">
+                  Payment Method
+                </h2>
+                <div className="space-y-4">
+                  <label
+                    className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all ${
+                      paymentMethod === "COD"
+                        ? "border-primary-600 bg-primary-50 ring-1 ring-primary-600"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="COD"
+                      checked={paymentMethod === "COD"}
+                      onChange={() => setPaymentMethod("COD")}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                    />
+                    <span className="ml-3 font-medium text-gray-900">Cash on Delivery (COD)</span>
+                  </label>
+
+                  <label
+                    className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all ${
+                      paymentMethod === "RAZORPAY"
+                        ? "border-primary-600 bg-primary-50 ring-1 ring-primary-600"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="RAZORPAY"
+                      checked={paymentMethod === "RAZORPAY"}
+                      onChange={() => setPaymentMethod("RAZORPAY")}
+                      className="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                    />
+                    <div className="ml-3 flex items-center">
+                      <span className="font-medium text-gray-900 mr-2">Pay Online</span>
+                      <span className="text-xs text-gray-500">(UPI, Cards, Net Banking)</span>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
 

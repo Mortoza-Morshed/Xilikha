@@ -1,14 +1,15 @@
+import "dotenv/config";
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import productRoutes from "./routes/products.js";
 import authRoutes from "./routes/auth.js";
 import orderRoutes from "./routes/orders.js";
 import contactRoutes from "./routes/contact.js";
+import paymentRoutes from "./routes/payment.js";
 
 // Load environment variables
-dotenv.config();
+// dotenv.config();
 
 // Connect to MongoDB
 connectDB();
@@ -41,6 +42,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

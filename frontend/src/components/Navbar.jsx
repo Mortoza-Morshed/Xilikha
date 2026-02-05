@@ -179,7 +179,7 @@ const Navbar = ({ cartCount }) => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-gray-700 focus:outline-none"
+            className="md:hidden text-gray-700 focus:outline-none relative"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               {isMenuOpen ? (
@@ -198,6 +198,16 @@ const Navbar = ({ cartCount }) => {
                 />
               )}
             </svg>
+            {/* Cart count badge on hamburger menu */}
+            {cartCount > 0 && !isMenuOpen && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center"
+              >
+                {cartCount > 9 ? "9+" : cartCount}
+              </motion.span>
+            )}
           </button>
         </div>
 
@@ -247,9 +257,18 @@ const Navbar = ({ cartCount }) => {
               <Link
                 to="/cart"
                 onClick={() => setIsMenuOpen(false)}
-                className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
+                className="flex items-center justify-between text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
               >
-                Cart ({cartCount})
+                <span>Cart</span>
+                {cartCount > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center ml-2"
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
               </Link>
             )}
             {user ? (

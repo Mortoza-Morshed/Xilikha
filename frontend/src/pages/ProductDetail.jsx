@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { getProductById } from "../services/productService";
 
-const ProductDetail = ({ addToCart }) => {
+const ProductDetail = ({ addToCart, cart, updateQuantity }) => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,8 +26,27 @@ const ProductDetail = ({ addToCart }) => {
     fetchProduct();
   }, [id]);
 
+  // Sync quantity with cart when product or cart changes
+  useEffect(() => {
+    if (product && cart) {
+      const cartItem = cart.find((item) => item.id === product.id);
+      if (cartItem) {
+        setQuantity(cartItem.quantity);
+      } else {
+        setQuantity(1);
+      }
+    }
+  }, [product, cart]);
+
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    const cartItem = cart?.find((item) => item.id === product.id);
+    if (cartItem) {
+      // If already in cart, update quantity
+      updateQuantity(product.id, quantity);
+    } else {
+      // If not in cart, add with quantity
+      addToCart(product, quantity);
+    }
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
@@ -151,7 +170,14 @@ const ProductDetail = ({ addToCart }) => {
                 <label className="text-gray-700 font-medium">Quantity:</label>
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    onClick={() => {
+                      const newQuantity = Math.max(1, quantity - 1);
+                      setQuantity(newQuantity);
+                      const cartItem = cart?.find((item) => item.id === product.id);
+                      if (cartItem) {
+                        updateQuantity(product.id, newQuantity);
+                      }
+                    }}
                     disabled={!product.inStock}
                     className={`px-4 py-2 transition-colors ${
                       product.inStock
@@ -169,7 +195,14 @@ const ProductDetail = ({ addToCart }) => {
                     {quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
+                    onClick={() => {
+                      const newQuantity = quantity + 1;
+                      setQuantity(newQuantity);
+                      const cartItem = cart?.find((item) => item.id === product.id);
+                      if (cartItem) {
+                        updateQuantity(product.id, newQuantity);
+                      }
+                    }}
                     disabled={!product.inStock}
                     className={`px-4 py-2 transition-colors ${
                       product.inStock

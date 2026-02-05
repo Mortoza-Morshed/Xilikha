@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import ProductCard from "../components/ProductCard";
 import { getProducts } from "../services/productService";
 
-const Shop = ({ addToCart }) => {
+const Shop = ({ addToCart, cart, updateQuantity }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -67,7 +67,12 @@ const Shop = ({ addToCart }) => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <ProductCard product={product} addToCart={addToCart} />
+                  <ProductCard
+                    product={product}
+                    addToCart={addToCart}
+                    cart={cart}
+                    updateQuantity={updateQuantity}
+                  />
                 </motion.div>
               ))}
             </div>
