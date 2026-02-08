@@ -78,7 +78,7 @@ const OrderHistory = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Page Header */}
-      <section className="bg-gradient-primary text-white px-4 md:px-6 py-12">
+      <section className="bg-gradient-primary text-white px-4 md:px-6 py-12 text-center">
         <div className="container-custom">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -164,14 +164,27 @@ const OrderHistory = () => {
                     </div>
 
                     {/* Status & Price */}
-                    <div className="flex items-center gap-4">
-                      <span
-                        className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getStatusColor(
-                          order.orderStatus,
-                        )}`}
-                      >
-                        {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
-                      </span>
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="flex gap-2">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
+                            order.paymentStatus === "PAID"
+                              ? "bg-green-100 text-green-800"
+                              : order.paymentStatus === "FAILED"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {order.paymentStatus || "PENDING"}
+                        </span>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getStatusColor(
+                            order.orderStatus,
+                          )}`}
+                        >
+                          {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+                        </span>
+                      </div>
                       <p className="text-base sm:text-lg font-bold text-gray-900 whitespace-nowrap">
                         ₹{order.total}
                       </p>

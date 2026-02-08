@@ -1,4 +1,5 @@
 import Order from "../models/Order.js";
+import Product from "../models/Product.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -7,6 +8,19 @@ export const createOrder = async (req, res) => {
   try {
     const { items, shippingAddress, subtotal, shipping, total } = req.body;
 
+    // Check stock availability for all items
+    for (const item of items) {
+      const product = await Product.findById(item.product);
+      if (!product) {
+        return res.status(404).json({ message: `Product not found: ${item.name}` });
+      }
+      if (product.stockQuantity < item.quantity) {
+        return res.status(400).json({
+          message: `Insufficient stock for ${product.name}. Only ${product.stockQuantity} left.`,
+        });
+      }
+    }
+
     const order = await Order.create({
       user: req.user.id,
       items,
@@ -14,7 +28,24 @@ export const createOrder = async (req, res) => {
       subtotal,
       shipping,
       total,
+      paymentMethod: req.body.paymentMethod || "COD",
+      orderStatus: req.body.paymentMethod === "COD" ? "processing" : "pending",
     });
+
+    // If COD, decrement stock immediately
+    if (order.paymentMethod === "COD") {
+      for (const item of items) {
+        const product = await Product.findById(item.product);
+        if (product) {
+          product.stockQuantity -= item.quantity;
+          if (product.stockQuantity <= 0) {
+            product.inStock = false;
+            product.stockQuantity = 0;
+          }
+          await product.save();
+        }
+      }
+    }
 
     res.status(201).json({
       success: true,

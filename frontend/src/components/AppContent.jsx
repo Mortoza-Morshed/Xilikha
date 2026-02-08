@@ -18,6 +18,13 @@ import OrderConfirmation from "../pages/OrderConfirmation";
 import OrderHistory from "../pages/OrderHistory";
 import OrderDetail from "../pages/OrderDetail";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminRoute from "./AdminRoute";
+import AdminLayout from "../pages/admin/AdminLayout";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import AdminOrders from "../pages/admin/AdminOrders";
+import AdminOrderDetail from "../pages/admin/AdminOrderDetail";
+import AdminProducts from "../pages/admin/AdminProducts";
+import ProductForm from "../pages/admin/ProductForm";
 
 const AppContent = () => {
   const { user, isAuthenticated } = useAuth();
@@ -164,6 +171,18 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="orders/:id" element={<AdminOrderDetail />} />
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="products/new" element={<ProductForm />} />
+              <Route path="products/edit/:id" element={<ProductForm />} />
+            </Route>
+          </Route>
         </Routes>
       </main>
       <Footer />

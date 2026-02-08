@@ -17,7 +17,7 @@ const Navbar = ({ cartCount }) => {
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="container-custom px-4 md:px-6 py-4">
+      <div className="w-full max-w-[1600px] mx-auto px-4 md:px-8 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
@@ -142,6 +142,15 @@ const Navbar = ({ cartCount }) => {
                     >
                       My Orders
                     </Link>
+                    {user.role === "admin" && (
+                      <Link
+                        to="/admin/dashboard"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        Admin Dashboard
+                      </Link>
+                    )}
                     <hr className="my-2" />
                     <button
                       onClick={handleLogout}
@@ -287,6 +296,15 @@ const Navbar = ({ cartCount }) => {
                 >
                   My Orders
                 </Link>
+                {user.role === "admin" && (
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     setIsMenuOpen(false);

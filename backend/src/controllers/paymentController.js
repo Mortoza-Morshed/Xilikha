@@ -1,6 +1,7 @@
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import Order from "../models/Order.js";
+import Product from "../models/Product.js";
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
@@ -77,10 +78,24 @@ export const verifyPayment = async (req, res) => {
       }
 
       order.paymentStatus = "PAID";
+      order.orderStatus = "processing"; // Auto-update to processing
       order.razorpayOrderId = razorpayOrderId;
       order.razorpayPaymentId = razorpayPaymentId;
       order.razorpaySignature = razorpaySignature;
       order.paidAt = new Date();
+
+      // Decrement Stock
+      for (const item of order.items) {
+        const product = await Product.findById(item.product);
+        if (product) {
+          product.stockQuantity -= item.quantity;
+          if (product.stockQuantity <= 0) {
+            product.inStock = false;
+            product.stockQuantity = 0;
+          }
+          await product.save();
+        }
+      }
 
       await order.save();
 

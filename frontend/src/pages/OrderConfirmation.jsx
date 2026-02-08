@@ -161,6 +161,33 @@ const OrderConfirmation = () => {
               ))}
             </div>
 
+            {/* Payment Information */}
+            <div className="mt-6 pt-6 border-t space-y-3">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Payment Details</h3>
+              <div className="flex justify-between text-gray-700">
+                <span>Method</span>
+                <span className="font-medium">
+                  {order.paymentMethod === "COD" ? "Cash on Delivery" : "Online Payment (Razorpay)"}
+                </span>
+              </div>
+              <div className="flex justify-between text-gray-700">
+                <span>Status</span>
+                <span
+                  className={`font-medium ${
+                    order.paymentStatus === "PAID" ? "text-green-600" : "text-yellow-600"
+                  }`}
+                >
+                  {order.paymentStatus}
+                </span>
+              </div>
+              {order.razorpayPaymentId && (
+                <div className="flex justify-between text-gray-700">
+                  <span>Transaction ID</span>
+                  <span className="font-mono text-sm">{order.razorpayPaymentId}</span>
+                </div>
+              )}
+            </div>
+
             {/* Order Total */}
             <div className="mt-6 pt-6 border-t space-y-3">
               <div className="flex justify-between text-gray-700">
