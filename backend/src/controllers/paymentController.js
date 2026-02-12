@@ -104,10 +104,17 @@ export const verifyPayment = async (req, res) => {
       // Send email notifications for Razorpay orders
       const user = await User.findById(order.user);
       if (user) {
+        // Populate order with product details for email
+        const populatedOrder = await Order.findById(order._id).populate("items.product");
+
         // Send confirmation to customer (don't wait)
-        sendOrderConfirmation(order, user).catch((err) => console.error("Email error:", err));
+        sendOrderConfirmation(populatedOrder, user).catch((err) =>
+          console.error("Email error:", err),
+        );
         // Send alert to admin (don't wait)
-        sendAdminOrderAlert(order, user).catch((err) => console.error("Email error:", err));
+        sendAdminOrderAlert(populatedOrder, user).catch((err) =>
+          console.error("Email error:", err),
+        );
       }
 
       res.status(200).json({

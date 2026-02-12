@@ -9,6 +9,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
  */
 export const sendOrderConfirmation = async (order, user) => {
   try {
+    console.log("📧 Attempting to send order confirmation to:", user.email);
     const emailHtml = orderConfirmationEmail(order, user);
 
     const { data, error } = await resend.emails.send({
@@ -20,6 +21,7 @@ export const sendOrderConfirmation = async (order, user) => {
 
     if (error) {
       console.error("❌ Failed to send order confirmation email:", error);
+      console.error("❌ Customer email was:", user.email);
       return { success: false, error };
     }
 
@@ -27,6 +29,7 @@ export const sendOrderConfirmation = async (order, user) => {
     return { success: true, data };
   } catch (error) {
     console.error("❌ Error sending order confirmation:", error);
+    console.error("❌ Customer email was:", user.email);
     return { success: false, error: error.message };
   }
 };
