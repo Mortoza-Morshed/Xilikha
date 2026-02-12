@@ -12,15 +12,19 @@ export const adminOrderAlertEmail = (order, user) => {
   });
 
   const itemsHtml = order.items
-    .map(
-      (item) => `
+    .map((item) => {
+      // Handle both populated and non-populated product data
+      const productName = item.product?.name || item.name || "Product";
+      const productPrice = item.product?.price || item.price || 0;
+
+      return `
     <tr>
-      <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${item.name}</td>
+      <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${productName}</td>
       <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.quantity}</td>
-      <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">₹${(item.price * item.quantity).toFixed(2)}</td>
+      <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">₹${(productPrice * item.quantity).toFixed(2)}</td>
     </tr>
-  `,
-    )
+  `;
+    })
     .join("");
 
   return `

@@ -10,22 +10,26 @@ export const orderConfirmationEmail = (order, user) => {
   });
 
   const itemsHtml = order.items
-    .map(
-      (item) => `
+    .map((item) => {
+      // Handle both populated and non-populated product data
+      const productName = item.product?.name || item.name || "Product";
+      const productPrice = item.product?.price || item.price || 0;
+
+      return `
     <tr>
       <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-        <strong>${item.name}</strong><br>
+        <strong>${productName}</strong><br>
         <span style="color: #6b7280; font-size: 14px;">Qty: ${item.quantity}</span>
       </td>
       <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">
-        ₹${item.price.toFixed(2)}
+        ₹${productPrice.toFixed(2)}
       </td>
       <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;">
-        <strong>₹${(item.price * item.quantity).toFixed(2)}</strong>
+        <strong>₹${(productPrice * item.quantity).toFixed(2)}</strong>
       </td>
     </tr>
-  `,
-    )
+  `;
+    })
     .join("");
 
   return `
