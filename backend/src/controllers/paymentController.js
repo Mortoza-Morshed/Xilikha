@@ -2,6 +2,8 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
+import User from "../models/User.js";
+import { sendOrderConfirmation, sendAdminOrderAlert } from "../services/emailService.js";
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
@@ -98,6 +100,15 @@ export const verifyPayment = async (req, res) => {
       }
 
       await order.save();
+
+      // Send email notifications for Razorpay orders
+      const user = await User.findById(order.user);
+      if (user) {
+        // Send confirmation to customer (don't wait)
+        sendOrderConfirmation(order, user).catch((err) => console.error("Email error:", err));
+        // Send alert to admin (don't wait)
+        sendAdminOrderAlert(order, user).catch((err) => console.error("Email error:", err));
+      }
 
       res.status(200).json({
         success: true,

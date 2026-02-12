@@ -1,5 +1,7 @@
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
+import User from "../models/User.js";
+import { sendOrderConfirmation, sendAdminOrderAlert } from "../services/emailService.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -44,6 +46,15 @@ export const createOrder = async (req, res) => {
           }
           await product.save();
         }
+      }
+
+      // Send email notifications for COD orders
+      const user = await User.findById(req.user.id);
+      if (user) {
+        // Send confirmation to customer (don't wait)
+        sendOrderConfirmation(order, user).catch((err) => console.error("Email error:", err));
+        // Send alert to admin (don't wait)
+        sendAdminOrderAlert(order, user).catch((err) => console.error("Email error:", err));
       }
     }
 
