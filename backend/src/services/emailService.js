@@ -9,27 +9,30 @@ const resend = new Resend(process.env.RESEND_API_KEY);
  */
 export const sendOrderConfirmation = async (order, user) => {
   try {
-    console.log("📧 Attempting to send order confirmation to:", user.email);
+    // Use shipping address email from checkout form, fallback to user email
+    const customerEmail = order.shippingAddress?.email || user.email;
+
+    console.log("📧 Attempting to send order confirmation to:", customerEmail);
     const emailHtml = orderConfirmationEmail(order, user);
 
     const { data, error } = await resend.emails.send({
       from: process.env.FROM_EMAIL || "Xilikha <noreply@resend.dev>",
-      to: user.email,
+      to: customerEmail,
       subject: `Order Confirmed - #${order._id.toString().slice(-8)} | Xilikha`,
       html: emailHtml,
     });
 
     if (error) {
       console.error("❌ Failed to send order confirmation email:", error);
-      console.error("❌ Customer email was:", user.email);
+      console.error("❌ Customer email was:", customerEmail);
       return { success: false, error };
     }
 
-    console.log("✅ Order confirmation email sent to:", user.email);
+    console.log("✅ Order confirmation email sent to:", customerEmail);
     return { success: true, data };
   } catch (error) {
     console.error("❌ Error sending order confirmation:", error);
-    console.error("❌ Customer email was:", user.email);
+    console.error("❌ Customer email was:", order.shippingAddress?.email || user.email);
     return { success: false, error: error.message };
   }
 };
