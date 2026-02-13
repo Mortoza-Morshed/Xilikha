@@ -57,9 +57,7 @@ export const orderConfirmationEmail = (order, user) => {
           <!-- Success Message -->
           <tr>
             <td style="padding: 40px 30px 20px 30px; text-align: center;">
-              <div style="width: 60px; height: 60px; background-color: #d1fae5; border-radius: 50%; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 30px; line-height: 1; display: block; color: #059669;">✓</span>
-              </div>
+              <div style="font-size: 60px; margin-bottom: 20px;">✅</div>
               <h2 style="margin: 0 0 10px 0; color: #111827; font-size: 24px; font-weight: 600;">Thank You for Your Order!</h2>
               <p style="margin: 0; color: #6b7280; font-size: 16px;">Your order has been confirmed and will be processed soon.</p>
             </td>
