@@ -34,31 +34,26 @@ export const createOrder = async (req, res) => {
       orderStatus: req.body.paymentMethod === "COD" ? "processing" : "pending",
     });
 
-    // If COD, decrement stock immediately
+    // If COD, decrement stock immediately using atomic bulkWrite (prevents race conditions)
     if (order.paymentMethod === "COD") {
-      for (const item of items) {
-        const product = await Product.findById(item.product);
-        if (product) {
-          product.stockQuantity -= item.quantity;
-          if (product.stockQuantity <= 0) {
-            product.inStock = false;
-            product.stockQuantity = 0;
-          }
-          await product.save();
-        }
-      }
+      const bulkOps = items.map((item) => ({
+        updateOne: {
+          filter: { _id: item.product, stockQuantity: { $gte: item.quantity } },
+          update: [
+            { $inc: { stockQuantity: -item.quantity } },
+            { $set: { inStock: { $gt: [{ $subtract: ["$stockQuantity", item.quantity] }, 0] } } },
+          ],
+        },
+      }));
+      await Product.bulkWrite(bulkOps);
 
       // Send email notifications for COD orders
       const user = await User.findById(req.user.id);
       if (user) {
-        // Populate order with product details for email
         const populatedOrder = await Order.findById(order._id).populate("items.product");
-
-        // Send confirmation to customer (don't wait)
         sendOrderConfirmation(populatedOrder, user).catch((err) =>
           console.error("Email error:", err),
         );
-        // Send alert to admin (don't wait)
         sendAdminOrderAlert(populatedOrder, user).catch((err) =>
           console.error("Email error:", err),
         );
@@ -211,16 +206,25 @@ export const cancelOrder = async (req, res) => {
       });
     }
 
-    // Only allow cancellation of pending orders
-    if (order.orderStatus !== "pending") {
+    // Only allow cancellation of pending or processing orders
+    if (!["pending", "processing"].includes(order.orderStatus)) {
       return res.status(400).json({
         success: false,
-        message: "Only pending orders can be cancelled",
+        message: "Order cannot be cancelled at this stage",
       });
     }
 
     order.orderStatus = "cancelled";
     await order.save();
+
+    // Restore stock atomically for all cancelled items
+    const restoreOps = order.items.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: [{ $inc: { stockQuantity: item.quantity } }, { $set: { inStock: true } }],
+      },
+    }));
+    await Product.bulkWrite(restoreOps);
 
     res.json({
       success: true,

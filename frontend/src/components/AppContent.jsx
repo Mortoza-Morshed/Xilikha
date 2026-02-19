@@ -17,6 +17,7 @@ import Profile from "../pages/Profile";
 import OrderConfirmation from "../pages/OrderConfirmation";
 import OrderHistory from "../pages/OrderHistory";
 import OrderDetail from "../pages/OrderDetail";
+import Wishlist from "../pages/Wishlist";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
 import AdminLayout from "../pages/admin/AdminLayout";
@@ -125,6 +126,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Cart cart={cart} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/wishlist"
+            element={
+              <ProtectedRoute>
+                <Wishlist addToCart={addToCart} />
               </ProtectedRoute>
             }
           />

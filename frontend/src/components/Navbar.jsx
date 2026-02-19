@@ -1,12 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Heart } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useWishlist } from "../context/WishlistContext";
 
 const Navbar = ({ cartCount }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -60,6 +63,28 @@ const Navbar = ({ cartCount }) => {
             >
               Contact
             </Link>
+
+            {/* Wishlist Icon - Only show when logged in */}
+            {user && (
+              <Link to="/wishlist" className="relative">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-primary-600 cursor-pointer hover:text-primary-700 p-3 rounded-full transition-colors relative"
+                >
+                  <Heart className="h-6 w-6" />
+                  {wishlistCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center"
+                    >
+                      {wishlistCount}
+                    </motion.span>
+                  )}
+                </motion.button>
+              </Link>
+            )}
 
             {/* Cart Icon - Only show when logged in */}
             {user && (
@@ -263,22 +288,40 @@ const Navbar = ({ cartCount }) => {
               Contact
             </Link>
             {user && (
-              <Link
-                to="/cart"
-                onClick={() => setIsMenuOpen(false)}
-                className="flex items-center justify-between text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
-              >
-                <span>Cart</span>
-                {cartCount > 0 && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center ml-2"
-                  >
-                    {cartCount}
-                  </motion.span>
-                )}
-              </Link>
+              <>
+                <Link
+                  to="/wishlist"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center justify-between text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
+                >
+                  <span>Wishlist</span>
+                  {wishlistCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center ml-2"
+                    >
+                      {wishlistCount}
+                    </motion.span>
+                  )}
+                </Link>
+                <Link
+                  to="/cart"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center justify-between text-gray-700 hover:text-primary-600 font-medium py-2 cursor-pointer"
+                >
+                  <span>Cart</span>
+                  {cartCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center ml-2"
+                    >
+                      {cartCount}
+                    </motion.span>
+                  )}
+                </Link>
+              </>
             )}
             {user ? (
               <>

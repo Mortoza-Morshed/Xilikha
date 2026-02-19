@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.js";
 import orderRoutes from "./routes/orders.js";
 import contactRoutes from "./routes/contact.js";
 import paymentRoutes from "./routes/payment.js";
+import wishlistRoutes from "./routes/wishlist.js";
 
 // Load environment variables
 // dotenv.config();
@@ -43,6 +44,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

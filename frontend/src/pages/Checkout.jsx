@@ -22,6 +22,21 @@ const Checkout = ({ cart, clearCart }) => {
   const [error, setError] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
 
+  // Check for buy now item in sessionStorage
+  const [buyNowItem, setBuyNowItem] = useState(null);
+  const [checkoutItems, setCheckoutItems] = useState([]);
+
+  useEffect(() => {
+    const buyNowData = sessionStorage.getItem("buyNowItem");
+    if (buyNowData) {
+      const item = JSON.parse(buyNowData);
+      setBuyNowItem(item);
+      setCheckoutItems([item]);
+    } else {
+      setCheckoutItems(cart);
+    }
+  }, [cart]);
+
   // Pre-fill form with user data
   useEffect(() => {
     if (user) {
@@ -34,7 +49,7 @@ const Checkout = ({ cart, clearCart }) => {
     }
   }, [user]);
 
-  const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const subtotal = checkoutItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const shipping = subtotal > 500 ? 0 : 50;
   const total = subtotal + shipping;
 
@@ -51,9 +66,9 @@ const Checkout = ({ cart, clearCart }) => {
     setError("");
 
     try {
-      // Transform cart items to match backend schema
+      // Transform checkout items to match backend schema
       const orderData = {
-        items: cart.map((item) => ({
+        items: checkoutItems.map((item) => ({
           product: item._id, // MongoDB ID
           quantity: item.quantity,
           price: item.price,
@@ -77,7 +92,12 @@ const Checkout = ({ cart, clearCart }) => {
         // Handle Cash on Delivery
         await createOrder(orderData);
         setOrderPlaced(true);
-        clearCart();
+        // Clear buy now item or cart
+        if (buyNowItem) {
+          sessionStorage.removeItem("buyNowItem");
+        } else {
+          clearCart();
+        }
         navigate("/orders");
       } else {
         // Handle Razorpay Payment
@@ -116,7 +136,12 @@ const Checkout = ({ cart, clearCart }) => {
 
               if (result.success) {
                 setOrderPlaced(true);
-                clearCart();
+                // Clear buy now item or cart
+                if (buyNowItem) {
+                  sessionStorage.removeItem("buyNowItem");
+                } else {
+                  clearCart();
+                }
                 navigate("/orders");
               }
             } catch (err) {
@@ -160,7 +185,7 @@ const Checkout = ({ cart, clearCart }) => {
     }
   };
 
-  if (cart.length === 0 && !orderPlaced) {
+  if (checkoutItems.length === 0 && !orderPlaced) {
     navigate("/cart");
     return null;
   }
@@ -379,7 +404,7 @@ const Checkout = ({ cart, clearCart }) => {
                 </h2>
 
                 <div className="space-y-4 mb-6">
-                  {cart.map((item) => (
+                  {checkoutItems.map((item) => (
                     <div key={item.id} className="flex justify-between text-gray-700">
                       <span>
                         {item.name} x {item.quantity}

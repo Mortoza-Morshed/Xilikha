@@ -86,18 +86,17 @@ export const verifyPayment = async (req, res) => {
       order.razorpaySignature = razorpaySignature;
       order.paidAt = new Date();
 
-      // Decrement Stock
-      for (const item of order.items) {
-        const product = await Product.findById(item.product);
-        if (product) {
-          product.stockQuantity -= item.quantity;
-          if (product.stockQuantity <= 0) {
-            product.inStock = false;
-            product.stockQuantity = 0;
-          }
-          await product.save();
-        }
-      }
+      // Decrement stock atomically using bulkWrite (prevents overselling race conditions)
+      const bulkOps = order.items.map((item) => ({
+        updateOne: {
+          filter: { _id: item.product, stockQuantity: { $gte: item.quantity } },
+          update: [
+            { $inc: { stockQuantity: -item.quantity } },
+            { $set: { inStock: { $gt: [{ $subtract: ["$stockQuantity", item.quantity] }, 0] } } },
+          ],
+        },
+      }));
+      await Product.bulkWrite(bulkOps);
 
       await order.save();
 

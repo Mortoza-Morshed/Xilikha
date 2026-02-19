@@ -1,15 +1,24 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { Heart, ShoppingBag, Zap } from "lucide-react";
 import { getProductById } from "../services/productService";
+import { useWishlist } from "../context/WishlistContext";
+import { useAuth } from "../context/AuthContext";
 
 const ProductDetail = ({ addToCart, cart, updateQuantity }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { isAuthenticated } = useAuth();
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
+
+  const inWishlist = product ? isInWishlist(product._id || product.id) : false;
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -49,6 +58,38 @@ const ProductDetail = ({ addToCart, cart, updateQuantity }) => {
     }
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      sessionStorage.setItem("redirectMessage", "Please login to purchase");
+      sessionStorage.setItem("redirectFrom", window.location.pathname);
+      navigate("/login");
+      return;
+    }
+
+    // Store buy now item in session storage
+    sessionStorage.setItem("buyNowItem", JSON.stringify({ ...product, quantity }));
+    navigate("/checkout");
+  };
+
+  const handleWishlistToggle = async () => {
+    if (!isAuthenticated) {
+      sessionStorage.setItem("redirectMessage", "Please login to add items to your wishlist");
+      sessionStorage.setItem("redirectFrom", window.location.pathname);
+      navigate("/login");
+      return;
+    }
+
+    try {
+      if (inWishlist) {
+        await removeFromWishlist(product._id || product.id);
+      } else {
+        await addToWishlist(product);
+      }
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+    }
   };
 
   if (loading) {
@@ -131,7 +172,22 @@ const ProductDetail = ({ addToCart, cart, updateQuantity }) => {
 
             {/* Product Info */}
             <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}>
-              <p className="text-primary-600 font-medium mb-2">{product.subtitle}</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-primary-600 font-medium">{product.subtitle}</p>
+                {/* Wishlist Heart Button */}
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleWishlistToggle}
+                  className="p-3 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"
+                >
+                  <Heart
+                    className={`h-6 w-6 ${
+                      inWishlist ? "fill-red-500 text-red-500" : "text-gray-600"
+                    }`}
+                  />
+                </motion.button>
+              </div>
               <h1 className="text-4xl font-display font-bold text-gray-900 mb-4">{product.name}</h1>
               <p className="text-3xl font-bold text-gray-900 mb-2">₹{product.price}</p>
               <p className="text-gray-600 mb-6">{product.weight}</p>
@@ -215,28 +271,48 @@ const ProductDetail = ({ addToCart, cart, updateQuantity }) => {
                 </div>
               </div>
 
-              {/* Add to Cart Button */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-4">
+                {/* Buy Now Button */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={handleAddToCart}
+                  onClick={handleBuyNow}
                   disabled={!product.inStock}
-                  className={`flex-1 ${
+                  className={`flex items-center justify-center gap-2 py-4 rounded-lg font-semibold text-lg transition-colors ${
                     product.inStock
-                      ? "btn-primary cursor-pointer"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed px-6 py-3 rounded-lg"
+                      ? "bg-accent-500 hover:bg-accent-600 text-white cursor-pointer shadow-lg"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >
-                  {addedToCart
-                    ? "✓ Added to Cart!"
-                    : product.inStock
-                      ? "Add to Cart"
-                      : "Out of Stock"}
+                  <Zap className="h-5 w-5" />
+                  {product.inStock ? "Buy Now" : "Out of Stock"}
                 </motion.button>
-                <Link to="/shop" className="flex-1">
-                  <button className="w-full btn-outline cursor-pointer">Continue Shopping</button>
-                </Link>
+
+                {/* Add to Cart and Continue Shopping */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleAddToCart}
+                    disabled={!product.inStock}
+                    className={`flex-1 flex items-center justify-center gap-2 ${
+                      product.inStock
+                        ? "btn-primary cursor-pointer"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed px-6 py-3 rounded-lg"
+                    }`}
+                  >
+                    <ShoppingBag className="h-5 w-5" />
+                    {addedToCart
+                      ? "✓ Added to Cart!"
+                      : product.inStock
+                        ? "Add to Cart"
+                        : "Out of Stock"}
+                  </motion.button>
+                  <Link to="/shop" className="flex-1">
+                    <button className="w-full btn-outline cursor-pointer">Continue Shopping</button>
+                  </Link>
+                </div>
               </div>
             </motion.div>
           </div>
