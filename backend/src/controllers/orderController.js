@@ -39,13 +39,15 @@ export const createOrder = async (req, res) => {
       const bulkOps = items.map((item) => ({
         updateOne: {
           filter: { _id: item.product, stockQuantity: { $gte: item.quantity } },
-          update: [
-            { $inc: { stockQuantity: -item.quantity } },
-            { $set: { inStock: { $gt: [{ $subtract: ["$stockQuantity", item.quantity] }, 0] } } },
-          ],
+          update: { $inc: { stockQuantity: -item.quantity } },
         },
       }));
       await Product.bulkWrite(bulkOps);
+      // Mark any products that hit 0 as out of stock
+      await Product.updateMany(
+        { _id: { $in: items.map((i) => i.product) }, stockQuantity: { $lte: 0 } },
+        { $set: { inStock: false, stockQuantity: 0 } },
+      );
 
       // Send email notifications for COD orders
       const user = await User.findById(req.user.id);
@@ -217,14 +219,19 @@ export const cancelOrder = async (req, res) => {
     order.orderStatus = "cancelled";
     await order.save();
 
-    // Restore stock atomically for all cancelled items
+    // Restore stock for all cancelled items
     const restoreOps = order.items.map((item) => ({
       updateOne: {
         filter: { _id: item.product },
-        update: [{ $inc: { stockQuantity: item.quantity } }, { $set: { inStock: true } }],
+        update: { $inc: { stockQuantity: item.quantity } },
       },
     }));
     await Product.bulkWrite(restoreOps);
+    // Mark restored products as back in stock
+    await Product.updateMany(
+      { _id: { $in: order.items.map((i) => i.product) }, stockQuantity: { $gt: 0 } },
+      { $set: { inStock: true } },
+    );
 
     res.json({
       success: true,

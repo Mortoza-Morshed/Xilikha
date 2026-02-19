@@ -124,88 +124,80 @@ const OrderHistory = () => {
                   transition={{ delay: index * 0.05 }}
                   className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4"
                 >
-                  {/* Compact Order Row */}
-                  <div className="flex flex-col md:flex-row md:items-center gap-4">
-                    {/* Product Images */}
-                    <div className="flex -space-x-2">
-                      {order.items.slice(0, 3).map((item, idx) => (
-                        <img
-                          key={idx}
-                          src={item.product?.image || "/assets/placeholder.png"}
-                          alt={item.product?.name}
-                          className="w-12 h-12 rounded-lg border-2 border-white object-cover"
-                        />
-                      ))}
-                      {order.items.length > 3 && (
-                        <div className="w-12 h-12 rounded-lg border-2 border-white bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600">
-                          +{order.items.length - 3}
-                        </div>
+                  <div className="flex items-center gap-4">
+                    {/* Product Thumbnail */}
+                    <div className="flex-shrink-0 relative">
+                      <img
+                        src={order.items[0]?.product?.image || "/assets/placeholder.png"}
+                        alt={order.items[0]?.product?.name}
+                        className="w-14 h-14 rounded-lg object-cover border border-gray-100"
+                      />
+                      {order.items.length > 1 && (
+                        <span className="absolute -top-1.5 -right-1.5 bg-primary-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          +{order.items.length - 1}
+                        </span>
                       )}
                     </div>
 
-                    {/* Order Info */}
+                    {/* Order Info + Status Badges */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-gray-900 truncate text-sm sm:text-base">
+                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                         {order.items.length === 1
                           ? order.items[0].product?.name || "Order"
                           : order.items.length === 2
-                            ? `${order.items[0].product?.name || "Product"} & ${order.items[1].product?.name || "Product"}`
-                            : `${order.items[0].product?.name || "Product"} & ${order.items.length - 1} more`}
+                            ? `${order.items[0].product?.name} & ${order.items[1].product?.name}`
+                            : `${order.items[0].product?.name} & ${order.items.length - 1} more`}
                       </h3>
-                      <p className="text-xs sm:text-sm text-gray-500">
+                      <p className="text-xs text-gray-500 mt-0.5">
                         {new Date(order.createdAt).toLocaleDateString("en-IN", {
                           month: "short",
                           day: "numeric",
                           year: "numeric",
                         })}
-                        {" • "}
-                        {order.items.length} item{order.items.length > 1 ? "s" : ""}
+                        {" · "}
+                        {order.items.reduce((sum, item) => sum + item.quantity, 0)} item
+                        {order.items.reduce((sum, item) => sum + item.quantity, 0) > 1 ? "s" : ""}
                       </p>
-                    </div>
-
-                    {/* Status & Price */}
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="flex gap-2">
+                      {/* Status Badges */}
+                      <div className="flex gap-1.5 mt-2 flex-wrap">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${
                             order.paymentStatus === "PAID"
-                              ? "bg-green-100 text-green-800"
+                              ? "bg-green-100 text-green-700"
                               : order.paymentStatus === "FAILED"
-                                ? "bg-red-100 text-red-800"
-                                : "bg-yellow-100 text-yellow-800"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-yellow-100 text-yellow-700"
                           }`}
                         >
                           {order.paymentStatus || "PENDING"}
                         </span>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getStatusColor(
-                            order.orderStatus,
-                          )}`}
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${getStatusColor(order.orderStatus)}`}
                         >
                           {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
                         </span>
                       </div>
-                      <p className="text-base sm:text-lg font-bold text-gray-900 whitespace-nowrap">
-                        ₹{order.total}
-                      </p>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex gap-2">
-                      <Link
-                        to={`/orders/${order._id}`}
-                        className="px-3 sm:px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs sm:text-sm font-medium transition-colors"
-                      >
-                        View
-                      </Link>
-                      {order.orderStatus === "pending" && (
-                        <button
-                          onClick={() => handleCancelOrder(order._id)}
-                          className="cursor-pointer px-3 sm:px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs sm:text-sm font-medium transition-colors"
+                    {/* Price + Actions */}
+                    <div className="flex-shrink-0 flex flex-col items-end gap-2">
+                      <p className="text-lg font-bold text-gray-900">₹{order.total}</p>
+                      <div className="flex gap-2">
+                        <Link
+                          to={`/orders/${order._id}`}
+                          className="px-4 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors"
                         >
-                          Cancel
-                        </button>
-                      )}
+                          View
+                        </Link>
+                        {["pending", "processing"].includes(order.orderStatus) && (
+                          <button
+                            onClick={() => handleCancelOrder(order._id)}
+                            className="cursor-pointer px-4 py-1.5 border border-red-300 hover:bg-red-50 text-red-600 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>

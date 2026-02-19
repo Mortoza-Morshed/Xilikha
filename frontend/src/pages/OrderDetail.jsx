@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { getOrderById } from "../services/orderService";
+import api from "../services/api";
 
 const OrderDetail = () => {
   const { id } = useParams();
@@ -9,6 +10,9 @@ const OrderDetail = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState("");
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -26,6 +30,20 @@ const OrderDetail = () => {
 
     fetchOrder();
   }, [id, navigate]);
+
+  const confirmCancelOrder = async () => {
+    setCancelling(true);
+    setCancelError("");
+    try {
+      await api.put(`/orders/${id}/cancel`);
+      setOrder((prev) => ({ ...prev, orderStatus: "cancelled" }));
+      setShowCancelModal(false);
+    } catch (err) {
+      setCancelError(err.response?.data?.message || "Failed to cancel order");
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   const getStatusColor = (status) => {
     const colors = {
@@ -281,6 +299,14 @@ const OrderDetail = () => {
                 </div>
 
                 <div className="mt-6 space-y-3">
+                  {["pending", "processing"].includes(order.orderStatus) && (
+                    <button
+                      onClick={() => setShowCancelModal(true)}
+                      className="cursor-pointer w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-medium transition-colors"
+                    >
+                      Cancel Order
+                    </button>
+                  )}
                   <Link to="/shop" className="btn-outline w-full text-center block">
                     Continue Shopping
                   </Link>
@@ -290,6 +316,43 @@ const OrderDetail = () => {
           </div>
         </div>
       </section>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-xl shadow-xl p-6 max-w-md w-full"
+          >
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Cancel Order?</h3>
+            <p className="text-gray-600 mb-4">
+              Are you sure you want to cancel this order? This action cannot be undone.
+            </p>
+            {cancelError && (
+              <p className="text-red-600 text-sm mb-4 bg-red-50 p-2 rounded">{cancelError}</p>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowCancelModal(false);
+                  setCancelError("");
+                }}
+                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+              >
+                Keep Order
+              </button>
+              <button
+                onClick={confirmCancelOrder}
+                disabled={cancelling}
+                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+              >
+                {cancelling ? "Cancelling..." : "Yes, Cancel"}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

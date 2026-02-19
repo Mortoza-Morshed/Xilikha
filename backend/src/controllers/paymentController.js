@@ -90,13 +90,15 @@ export const verifyPayment = async (req, res) => {
       const bulkOps = order.items.map((item) => ({
         updateOne: {
           filter: { _id: item.product, stockQuantity: { $gte: item.quantity } },
-          update: [
-            { $inc: { stockQuantity: -item.quantity } },
-            { $set: { inStock: { $gt: [{ $subtract: ["$stockQuantity", item.quantity] }, 0] } } },
-          ],
+          update: { $inc: { stockQuantity: -item.quantity } },
         },
       }));
       await Product.bulkWrite(bulkOps);
+      // Mark any products that hit 0 as out of stock
+      await Product.updateMany(
+        { _id: { $in: order.items.map((i) => i.product) }, stockQuantity: { $lte: 0 } },
+        { $set: { inStock: false, stockQuantity: 0 } },
+      );
 
       await order.save();
 
