@@ -57,8 +57,13 @@ const productSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 );
+
+// Index for faster lookups by slug id
+productSchema.index({ id: 1 });
 
 const Product = mongoose.model("Product", productSchema);
 

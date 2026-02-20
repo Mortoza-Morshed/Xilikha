@@ -38,9 +38,10 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Registration error:", error);
     res.status(400).json({
       success: false,
-      message: error.message,
+      message: "Registration failed. Please check your details and try again.",
     });
   }
 };
@@ -94,9 +95,10 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Login failed. Please try again.",
     });
   }
 };
@@ -113,9 +115,10 @@ export const getMe = async (req, res) => {
       data: user,
     });
   } catch (error) {
+    console.error("Get user error:", error);
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Failed to fetch user profile.",
     });
   }
 };
@@ -141,9 +144,10 @@ export const updateProfile = async (req, res) => {
       data: user,
     });
   } catch (error) {
+    console.error("Profile update error:", error);
     res.status(400).json({
       success: false,
-      message: error.message,
+      message: "Failed to update profile. Please try again.",
     });
   }
 };

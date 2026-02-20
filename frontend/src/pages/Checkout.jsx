@@ -110,8 +110,8 @@ const Checkout = ({ cart, clearCart }) => {
         });
         const dbOrderId = newOrder._id;
 
-        // 2. Create Razorpay order (backend)
-        const { orderId, amount, keyId } = await createRazorpayOrder(total);
+        // 2. Create Razorpay order (amount verified server-side from DB)
+        const { orderId, amount, keyId } = await createRazorpayOrder(dbOrderId);
 
         // 3. Open Razorpay Modal
         const options = {

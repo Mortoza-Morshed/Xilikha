@@ -1,8 +1,8 @@
 import api from "./api";
 
-// Create Razorpay order
-export const createRazorpayOrder = async (amount, orderId) => {
-  const response = await api.post("/payment/create-order", { amount, orderId });
+// Create Razorpay order (amount is verified server-side from the DB order)
+export const createRazorpayOrder = async (orderId) => {
+  const response = await api.post("/payment/create-order", { orderId });
   return response.data;
 };
 

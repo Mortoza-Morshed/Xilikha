@@ -67,9 +67,10 @@ export const createOrder = async (req, res) => {
       data: order,
     });
   } catch (error) {
+    console.error("Create order error:", error);
     res.status(400).json({
       success: false,
-      message: error.message,
+      message: "Failed to create order. Please try again.",
     });
   }
 };
@@ -89,9 +90,10 @@ export const getMyOrders = async (req, res) => {
       data: orders,
     });
   } catch (error) {
+    console.error("Get orders error:", error);
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Failed to fetch orders.",
     });
   }
 };
@@ -123,9 +125,10 @@ export const getOrderById = async (req, res) => {
       data: order,
     });
   } catch (error) {
+    console.error("Get order error:", error);
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Failed to fetch order details.",
     });
   }
 };
@@ -179,9 +182,10 @@ export const updateOrderStatus = async (req, res) => {
       data: order,
     });
   } catch (error) {
+    console.error("Update order status error:", error);
     res.status(400).json({
       success: false,
-      message: error.message,
+      message: "Failed to update order status.",
     });
   }
 };
@@ -238,9 +242,10 @@ export const cancelOrder = async (req, res) => {
       data: order,
     });
   } catch (error) {
+    console.error("Cancel order error:", error);
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Failed to cancel order.",
     });
   }
 };
